@@ -1,5 +1,13 @@
 # lazy-devs-v3
-hey, here we go V3
+hey, here we go V3.1, now is dev model
+ 
+# new feature
+- add .gitignore to zip file
+```
+node_modules
+package-lock.json
+.env
+```
 
 
 # How to use
