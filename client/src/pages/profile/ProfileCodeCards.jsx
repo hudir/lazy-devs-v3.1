@@ -66,41 +66,30 @@ const ProfileCodeCards = () => {
     try {
       const data = await axios.get(`${baseUrl}/user/templates/download/${id}`);
       const zip = new JSZip();
-      console.log(data.data);
-      zip.folder(data.data.templateName).file("package.json", rootJson);
-      zip
-        .folder(data.data.templateName)
-        .folder("client")
-        .folder("src")
-        .file("App.js", data.data.frontend);
-      zip
-        .folder(data.data.templateName)
-        .folder("client")
-        .folder("src")
-        .file("index.js", indexJs);
-      zip
-        .folder(data.data.templateName)
-        .folder("client")
-        .folder("public")
-        .file("index.html", indexHtml);
-      zip
-        .folder(data.data.templateName)
-        .folder("server")
-        .file("server.js", data.data.backend);
+    
+      const root = zip.folder(data.data.templateName)
+      const server = root.folder('server')
 
-      zip
-        .folder(data.data.templateName)
-        .folder("client")
-        .file("package.json", data.data.frontEndPackageJSON);
+      const client = root.folder('client')
+      const src = client.folder('src')
+      const publicFolder = client.folder('public')
 
-      zip
-        .folder(data.data.templateName)
-        .folder("server")
-        .file("package.json", data.data.backendPackageJSON);
-      zip
-        .folder(data.data.templateName)
-        .folder("server")
-        .file(".env", data.data.backendDotenv);
+
+      root.file("package.json", rootJson);
+      root.file(".gitignore", gitignore)
+
+      client.file("package.json", data.data.frontEndPackageJSON);
+
+      src.file("App.js", data.data.frontend);
+      src.file("index.js", indexJs);
+
+      publicFolder.file("index.html", indexHtml);
+      
+
+      server.file("server.js", data.data.backend);
+      server.file("package.json", data.data.backendPackageJSON);
+      server.file(".env", data.data.backendDotenv);
+    
 
       zip
         .generateAsync({
@@ -275,3 +264,8 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 `;
+
+const gitignore = `node_modules
+package-lock.json
+.env
+`
