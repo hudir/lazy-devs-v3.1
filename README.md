@@ -1,3 +1,16 @@
+# lazy-devs-v3.1
+
+### add .gitignore to zip file(rewrite zip code)
+### passport open auth for google and github
+   ! passport will use session - that's cookie
+ ```js  
+ req.body.backend_packages.google
+ req.body.backend_packages.github
+ ``` 
+ request come from client
+
+
+
 # lazy-devs-v3
 hey, here we go V3
 

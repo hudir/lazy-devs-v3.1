@@ -11,6 +11,17 @@ const serverJsFull = (
   filePath = "./test/server/server.js"
 ) => {
   //Template for server.js
+
+ // new for v3.1
+  // passport open auth for google and github
+  let passport
+  let google =  req.body.backend_packages["passport-google-oauth20"]
+  let github = req.body.backend_packages["passport-github2"]
+  if(google || github)  {
+    passport = true
+  }
+ 
+
   // what we need to do before work on the template?
   let nodemailer = req.body.backend_packages.nodemailer;
   let bt = req.body.backend_packages.bcrypt;
@@ -96,6 +107,10 @@ const serverJsFull = (
   require('dotenv').config();`
       : ""
   }
+  ${passport ? `const passport = require('passport');` : ''}
+  ${github ? `const GitHubStrategy = require('passport-github2').Strategy;` : ''}
+  ${google ? `const GoogleStrategy = require('passport-google-oauth20');` : ''}
+
   
   // importing Port
   const port = process.env.PORT || 5000;
@@ -105,7 +120,7 @@ const serverJsFull = (
       : `lazydev`
   }"
   ${
-    tm1
+    tm1 || passport
       ? `// Template - 1 session + proxy
   const session = require('express-session'); `
       : ""
@@ -186,7 +201,7 @@ const serverJsFull = (
   app.use(express.urlencoded({extended: false}))
   
   ${
-    tm1
+    tm1 || passport
       ? `// Template - 1 session + proxy
   app.use(cors())
   app.use(session({ 

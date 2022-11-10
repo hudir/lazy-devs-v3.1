@@ -7,6 +7,23 @@ const configReqBody = (obj) => {
   obj.backend_packages ? null : (obj.backend_packages = {});
   obj.frontend_packages ? null : (obj.frontend_packages = {});
 
+  // new for v3.1
+  // passport open auth for google and github
+  let google = req.body.backend_packages.google
+  let github = req.body.backend_packages.github
+  if(google || github)  {
+    req.body.backend_packages.passport = true
+    req.body.backend_packages["express-session"] = true
+  }
+  if (google) {
+    req.body.backend_packages["passport-google-oauth20"] = true
+    delete req.body.backend_packages.google
+  }
+  if (github) {
+    req.body.backend_packages["passport-github2"] = true
+    delete req.body.backend_packages.github
+  }
+
   // add bcrypet
   if (
     obj.backend_packages.nodemailer ||
