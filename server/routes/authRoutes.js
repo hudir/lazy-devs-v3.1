@@ -27,7 +27,7 @@ router.get('/github', passport.authenticate('github', { scope: [ 'user:email' ] 
 router.get('/github/callback', passport.authenticate('github', { failureRedirect: '/login' }), githubCallback)
 
 // google part
-router.get('/google', passport.authenticate('google', { scope: ['profile'] }) );
+router.get('/google', passport.authenticate('google', { scope: ['profile, email'] }) );
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), githubCallback);
 
 module.exports = router;

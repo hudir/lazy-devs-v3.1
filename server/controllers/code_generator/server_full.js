@@ -100,6 +100,7 @@ const serverJsFull = (
     req.body.secretKey ? req.body.secretKey : null
   }\` || process.env.SECRETKEY || "test";
   ${nodemailer ? "const nodemailer = require('nodemailer');" : ""}
+  ${passport ? ` const passport = require('passport');` : ""}
   
   ${
     dotenv
@@ -254,6 +255,16 @@ const serverJsFull = (
   userRouter.get("/profile", auth, profile_controller);
   userRouter.get("/logout", auth, logout_controller);
   userRouter.get("/loginStatus", auth, loginStatus_controller);
+
+  ${github ? `// github part
+  userRouter.get('/github', passport.authenticate('github', { scope: [ 'user:email' ] }) );
+  userRouter.get('/github/callback', passport.authenticate('github', { failureRedirect: '/login' }), githubCallback)
+  ` : ""}
+
+  ${google ? `// google part
+  userRouter.get('/google', passport.authenticate('google', { scope: ['profile, email'] }) );
+  userRouter.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), githubCallback);
+  ` : ""}
   
   // Router settings
   app.use('/', indexRouter)
@@ -653,7 +664,11 @@ const serverJsFull = (
     }
   };
   
-  
+  ${passport ? `function githubCallback(req, res) { // this part need more work
+    req.session.user = req.user;
+    res.redirect(config[config.model].frontEnd + '/profile');
+  }` : ""}
+
   // partial functions
   ${
     bt
@@ -779,7 +794,6 @@ const serverJsFull = (
 
   ${passport ? `const passportOauth = (app) => {
     // passport codes start
-    const passport = require('passport');
     ${github ? `const GitHubStrategy = require('passport-github2').Strategy;
     const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
     const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;` : ""}
