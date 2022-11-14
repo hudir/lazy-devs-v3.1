@@ -30,6 +30,7 @@
   // }
  ``` 
  request come from client
+ inside GoogleStrategy and GitHubStrategy here you need config the profile with your User_model Schema
 
 
 

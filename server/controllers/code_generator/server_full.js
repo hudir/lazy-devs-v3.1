@@ -290,8 +290,8 @@ const serverJsFull = (
       },`
           : ""
       }
-      ${google ? `googleId: String,` : ""}
-      ${github ? `githubId: String,` : ""}
+      ${google ? `googleID: String,` : ""}
+      ${github ? `githubID: String,` : ""}
       ${registrationInputs
         .map((el) => {
           if (el.type != "button")
@@ -780,15 +780,14 @@ const serverJsFull = (
   ${passport ? `const passportOauth = (app) => {
     // passport codes start
     const passport = require('passport');
-    const GitHubStrategy = require('passport-github2').Strategy;
-    const GoogleStrategy = require('passport-google-oauth20'); 
+    ${github ? `const GitHubStrategy = require('passport-github2').Strategy;
+    const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+    const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;` : ""}
+    ${google ? `const GoogleStrategy = require('passport-google-oauth20'); 
+    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;` : ""}
     ${!bt ? `const bcrypt = require('bcrypt');` : ""}
     
-    const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-    const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-  
     passport.serializeUser(function (user, done) {
       done(null, user);
     });
@@ -797,7 +796,7 @@ const serverJsFull = (
       done(null, obj);
     });
   
-    passport.use(
+    ${github ? `passport.use(
       new GitHubStrategy(
         {
           clientID: GITHUB_CLIENT_ID,
@@ -807,10 +806,7 @@ const serverJsFull = (
         },
         function (accessToken, refreshToken, profile, done) {
          
-          // console.log(profile._json)
-          // console.log(profile._json.email, profile._json.url, profile._json.name)
-  
-          User.findOne({ githubID: profile._json.id }, (err, user) => {
+          User_model.findOne({ githubID: profile._json.id }, (err, user) => {
             if (err) return console.error(err);
             if (user) return done(null, user);
             // no such user found in db, create new user
@@ -818,12 +814,12 @@ const serverJsFull = (
             let githubEmail;
             // to see if this email alreay in out db
             if (profile._json.email) {
-              User.findOne({ email: profile._json.email }, (err, existUser) => {
+              User_model.findOne({ email: profile._json.email }, (err, existUser) => {
                 if (err) return console.error(err);
   
                 if (existUser)
                   // if we find this email, update this user with his github id
-                  User.findOneAndUpdate(
+                  User_model.findOneAndUpdate(
                     { _id: existUser._id },
                     { $set: { githubID: profile._json.id } },
                     { new: true },
@@ -838,14 +834,14 @@ const serverJsFull = (
                   // here need bcrypt the password
                   bcrypt.hash(profile._json.url, 10, (err, notPassword) => {
                     if (err) return console.error(err);
-                    User.create({
+                    User_model.create({ // here you need config the profile with your User_model Schema
                       githubID: profile._json.id,
                       email: githubEmail,
                       password: notPassword,
-                      firstName: profile._json.name,
-                      lastName: '   ',
-                      verified: true,
-                      avatar: profile._json.avatar_url,
+                      // firstName: profile._json.name,
+                      // lastName: '   ',
+                      // verified: true,
+                      // avatar: profile._json.avatar_url,
                     })
                       .then((newUser) => done(null, newUser))
                       .catch((err) => console.error(err));
@@ -858,14 +854,14 @@ const serverJsFull = (
               // here need bcrypt the password
               bcrypt.hash(profile._json.url, 10, (err, notPassword) => {
                 if (err) return console.error(err);
-                User.create({
+                User_model.create({ // here you need config the profile with your User_model Schema
                   githubID: profile._json.id,
                   email: githubEmail,
                   password: notPassword,
-                  firstName: profile._json.name,
-                  lastName: '   ',
-                  verified: true,
-                  avatar: profile._json.avatar_url,
+                  // firstName: profile._json.name,
+                  // lastName: '   ',
+                  // verified: true,
+                  // avatar: profile._json.avatar_url,
                 })
                   .then((newUser) => done(null, newUser))
                   .catch((err) => console.error(err));
@@ -874,38 +870,36 @@ const serverJsFull = (
           });
         }
       )
-    );
-  
-    passport.use(
+    );` : ""}
+    ${google ? `passport.use(
       new GoogleStrategy(
         {
           clientID: GOOGLE_CLIENT_ID,
           clientSecret: GOOGLE_CLIENT_SECRET,
           callbackURL:
-            config[config.model].domain + '/authentication/google/callback',
+          ${req.body.backendOrigin + req.body.port} + '/authentication/google/callback',
         },
         function (accessToken, refreshToken, profile, cb) {
-          // console.log(profile, 'profile222222222222')
-  
-          User.findOne({ googleID: profile._json.sub }, (err, user) => {
+      
+          User_model.findOne({ googleID: profile._json.sub }, (err, user) => {
             if (err) return console.error(err);
             if (user) return cb(null, user);
             // no such user found in db, create new user
   
             // no email we will create one new
-            const googleEmail =
+            const googleEmail = profile._json.email || 
               'thisIsFakeEmail' + profile._json.sub + '@google.com';
             // here need bcrypt the password
             bcrypt.hash(profile._json.picture, 10, (err, notPassword) => {
               if (err) return console.error(err);
-              User.create({
+              User_model.create({ // here you need config the profile with your User_model Schema
                 googleID: profile._json.sub,
                 email: googleEmail,
                 password: notPassword,
-                firstName: profile._json.given_name,
-                lastName: profile._json.family_name,
-                verified: true,
-                avatar: profile._json.picture,
+                // firstName: profile._json.given_name,
+                // lastName: profile._json.family_name,
+                // verified: true,
+                // avatar: profile._json.picture,
               })
                 .then((newUser) => {
                   return cb(null, newUser);
@@ -915,8 +909,8 @@ const serverJsFull = (
           });
         }
       )
-    );
-  
+    );` : ""}
+    
     app.use(passport.initialize());
     app.use(passport.session());
   
@@ -925,7 +919,6 @@ const serverJsFull = (
     //    res.redirect('http://localhost:3000');
     //  });
   
-    // it's not working , even we get profiel from github, there is no req.isAuthenticated function in req
     //  function ensureAuthenticated(req, res, next) {
     //   if (req.session.user) {
     //     req.user = req.session.user
@@ -937,7 +930,7 @@ const serverJsFull = (
     // passport codes endet
   };
   
-  module.exports = passportOauth;
+  // module.exports = passportOauth;
   ` : ""}
   
   `;
