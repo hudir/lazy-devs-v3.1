@@ -27,6 +27,18 @@
     
     # secret key for keeping secret
     SECRETKEY="${req.body.secretKey}"
+
+    ${req.body.google ? `
+    # setting for google log in
+    GOOGLE_CLIENT_ID=${req.body.googleSetting?.clientId}
+    GOOGLE_CLIENT_SECRET=${req.body.googleSetting?.secret}
+    ` : ""}
+
+    ${req.body.github ? `
+    # setting for github log in
+    GITHUB_CLIENT_ID=${req.body.githubSetting?.clientId}
+    GITHUB_CLIENT_SECRET=${req.body.githubSetting?.secret}
+    ` : ""}
     `
     
     const trimEmptyLine =require('./tools/trimEmptyLine')

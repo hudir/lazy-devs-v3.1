@@ -19,19 +19,29 @@ const configReqBody = (obj) => {
 
   // new for v3.1
   // passport open auth for google and github
-  let google = req.body.backend_packages.google
-  let github = req.body.backend_packages.github
+  // // inside req.body = {
+  //   google: true, 
+  //   googleSetting: {
+  //   clientId:xxxx,
+  //   secret:xxxx
+  // }
+  //   github: true,
+  //   githubSetting: {
+  //   clientId:xxxx,
+  //   secret:xxxx
+  // }
+  // }
+  let google = req.body.google
+  let github = req.body.github
   if(google || github)  {
     req.body.backend_packages.passport = true
     req.body.backend_packages["express-session"] = true
   }
   if (google) {
-    req.body.backend_packages["passport-google-oauth20"] = true
-    delete req.body.backend_packages.google
+    req.body.backend_packages["passport-google-oauth20"] = true  
   }
   if (github) {
     req.body.backend_packages["passport-github2"] = true
-    delete req.body.backend_packages.github
   }
 
   // add bcrypet
@@ -50,8 +60,20 @@ const configReqBody = (obj) => {
     let mainInput = obj.registrationInputs.filter((x) => x.main)[0];
     if (!mainInput) {
       // there is no main. let the first to be main, update mainInput 1- unique,
-      obj.registrationInputs[0].main = true;
-      mainInput = obj.registrationInputs[0];
+      // what if first is password, then in server.js we will have 2 password. so mainInput.type can not be password
+      let triger = 0 
+      obj.registrationInputs.forEach(x=>{
+        if (x.type !== "password" && triger == 0) {
+          x.main = true;
+          mainInput = x
+          triger = 1
+        }
+      })
+      // what if all the registrationInputs are password, than just take the first one, there will be error in server.js(double password in login controller)
+      if (triger == 0) {
+        obj.registrationInputs[0].main = true;
+        mainInput = obj.registrationInputs[0]
+      }
     }
     // push maininput to loginInputs
     obj.loginInputs.push(mainInput);

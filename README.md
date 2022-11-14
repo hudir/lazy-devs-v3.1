@@ -4,8 +4,30 @@
 ### passport open auth for google and github
    ! passport will use session - that's cookie
  ```js  
- req.body.backend_packages.google
- req.body.backend_packages.github
+ req.body.google
+ req.body.github
+
+ req.body.githubSetting = {
+  clientId: "clientId",
+  secret: "secret"
+ }
+
+  req.body.googleSetting = {
+  clientId: "clientId",
+  secret: "secret"
+ }
+   // // inside req.body = {
+  //   google: true, 
+  //   googleSetting: {
+  //   clientId:xxxx,
+  //   secret:xxxx
+  // }
+  //   github: true,
+  //   githubSetting: {
+  //   clientId:xxxx,
+  //   secret:xxxx
+  // }
+  // }
  ``` 
  request come from client
 
