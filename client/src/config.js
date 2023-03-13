@@ -6,8 +6,8 @@ const config = {
     frontEnd: "http://localhost:3000",
   },
   deploy: {
-    domain: "https://lazydevs.onrender.com",
-    frontEnd: "https://lazydevs.onrender.com",
+    domain: "https://lazydev.onrender.com",
+    frontEnd: "https://lazydev.onrender.com",
   },
 };
 // "proxy": "http://localhost:5000",
