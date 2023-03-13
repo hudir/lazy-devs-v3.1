@@ -24,7 +24,7 @@ const emailSender = async (mailTo, userId) => {
       to: mailTo, // list of receivers
       subject: 'Please verify your email address', // Subject line
       text: 'Hello world?', // plain text body
-      html: `<p>Thank you for registering, to prevent spam accounts, please follow this <a href="https://lazydevs.onrender.com/authentication/verify/${userId}">link</a><p>`, // html body
+      html: `<p>Thank you for registering, to prevent spam accounts, please follow this <a href="https://lazydev.onrender.com/authentication/verify/${userId}">link</a><p>`, // html body
     });
   } catch (err) {
     throw new ExpressError(err);
@@ -40,7 +40,7 @@ const resetPasswordMail = async (mailTo, userId) => {
       to: mailTo,
       subject: 'Password reset',
       text: 'Follow the link below',
-      html: `<p>To get a new password, please click on this <a href="https://lazydevs.onrender.com//user/setNewPassword/${token}">link</a> and reset your password </p>`,
+      html: `<p>To get a new password, please click on this <a href="https://lazydev.onrender.com//user/setNewPassword/${token}">link</a> and reset your password </p>`,
     });
     await User.findByIdAndUpdate(userId, { resetLink: token });
   } catch (err) {
